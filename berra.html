@@ -1,0 +1,95 @@
+<html>
+<body>
+  <h2> Rundor </h2>
+  <div id='round-list'></div>
+  <h2> Spel </h2>
+  <input type='text' id='game-input' onkeypress='newGame(event)'></input>
+  <div id='game-list'></div>
+  <h2> Spelare </h2>
+  <input type='text' id='player-input' onkeypress='newPlayer(event)'></input>
+  <div id='player-list'></div>
+  <script type='text/javascript'>
+    window.onload = function(){
+      roundList = document.getElementById('round-list');
+      gameList = document.getElementById('game-list');
+      playerList = document.getElementById('player-list');
+
+      get('http://jsonplaceholder.typicode.com/posts/', function(stuff){
+        for(el of stuff){
+          //roundList.innerHTML += '<p>'+el.title+'</p>';
+        }
+      });
+
+      get('http://jsonplaceholder.typicode.com/posts/', function(stuff){
+        for(el of stuff){
+          //gameList.innerHTML += '<p>'+el.title+'</p>';
+        }
+      });
+
+      get('http://jsonplaceholder.typicode.com/posts/', function(stuff){
+        for(el of stuff){
+          //playerList.innerHTML += '<p>'+el.title+'</p>';
+        }
+      });
+
+    }
+
+    function newGame(key){
+      if(key.charCode==13 || key.keyCode ==13){
+        var name = document.getElementById('game-input').value;
+        document.getElementById('game-input').value = ''
+        postGame(name);
+      }
+    }
+
+
+    function newPlayer(key){
+      if(key.charCode==13 || key.keyCode ==13){
+        var name = document.getElementById('player-input').value;
+        document.getElementById('player-input').value = ''
+        postPlayer(name);
+      }
+    }
+
+    function postPlayer(name){
+      post('http://jsonplaceholder.typicode.com/posts', {name:name}, function(result){
+        playerList.innerHTML = playerList.innerHTML + '<p>'+result.name+'</p>';
+      });
+    }
+    function postGame(name){
+      post('http://jsonplaceholder.typicode.com/posts', {name:name}, function(result){
+        gameList.innerHTML = gameList.innerHTML + '<p>'+result.name+'</p>';
+      });
+    }
+    function postRound(gameId, date, scores){
+      post('http://jsonplaceholder.typicode.com/posts', {game:gameId, date:date,scores:scores}, function(result){
+        console.log(result);
+      });
+    }
+
+    function get(url, callback) {
+      var xmlHttp = new XMLHttpRequest();
+      xmlHttp.onreadystatechange = function() {
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+          callback(JSON.parse(xmlHttp.responseText));
+      }
+      xmlHttp.open("GET", url, true);
+      xmlHttp.send(null);
+    }
+
+    function post(url, body, callback){
+      var xmlHttp = new XMLHttpRequest();
+      var responseWritten = false;
+      xmlHttp.onreadystatechange = function() {
+        if(!responseWritten && xmlHttp.responseText !== ''){
+          callback(JSON.parse(xmlHttp.responseText));
+          responseWritten = true
+        }
+      }
+      xmlHttp.open("POST", url, true);
+      xmlHttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      xmlHttp.send(JSON.stringify(body));
+    }
+  </script>
+</body>
+</html>
